@@ -1,0 +1,85 @@
+Using pyk8055
+--------------------
+
+Below is a quick example to use the module followed by the list of possible commands. 
+
+Example
+----------------
+
+import pyk8055
+
+dev = pyk8055.device()
+
+dev.digital_on(1) # Turns on digital channel 1
+dev.digital_on(3)
+
+dev.digital_off(1) # Turns off digital channel 1
+dev.digital_off(3)
+
+dev.digital_all_on() # Turns all digital channels on
+dev.digital_all_off() #Turns all digital channels off
+
+print dev.digital_in(1) # Checks the value of the input digital channel 1 (1 - on , 0 - off)
+
+print dev.analog_in(2) # Checks the value of the input analogue channel 2 (0-255)
+
+dev.disconnect() # Disconnects the device 
+----------------------
+
+Listing
+-----------
+
+disconnect()
+# Disconnects the device properly
+        
+analog_in(channel) 
+# Checks value of analogue input channel specified, returns int.  
+
+analog_all_in()
+# Checks value of both analogue input channels, returns tuple. 
+
+analog_clear(channel)
+# Resets/ clears the value of the analogue output channel specified.
+
+analog_all_clear()
+# Resets/ clears the value of both analogue output channels.
+
+analog_out(channel, value)
+# Sets the value (0-255) to the analogue output channel
+
+analog_all_out(data1,data2) 
+# Sets the value(0-255) to the individual analogue output channels
+
+digital_write(data)
+# Sets the all the digital outputs acccording to the data, data is a sum of the binary sequence of the On switches I.e. switchs=number, 1=1, 4=8, 1+4=9,1+2+3+4=15
+
+
+digital_off(channel)
+# Turns off the digital output channel specified.
+
+digital_all_off()
+# Turns off all the digital output channels.
+               
+digital_on(channel)
+# Turns on the digital output channel specified.
+       
+digital_all_on()
+# Turns on all the digital output channels.
+                
+digital_in(channel)
+# Checks the state of digital input channel specified, returns int (1 - On, 0 - Off)
+        
+digital_all_in()
+# Checks the state off all digital input channels, returns int correspoding to a binary nibble sum of on switches. I.e. switchs=number, 1=1, 4=8, 1+4=9,1+2+3+4=15
+
+                
+counter_reset(channel)
+# Resets the specified counter. Either on channel 1 or 2 of the digital inputs 
+        
+counter_read(channel)
+# Reads the value of the channel specified, returns int
+        
+counter_set_debounce(channel,time)
+# Sets the specified counter with the specified debounce time between 0 - 5000ms.
+
+        
