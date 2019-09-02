@@ -56,16 +56,18 @@ def display_temperature(img, val_k, loc, color):
   cv2.line(img, (x, y - 2), (x, y + 2), color, 1)
 
 def findBounds(img, fire):
-  #print("finding bounds")
-  #print(minTemp)
+  print("finding bounds")
+  print(minTemp)
   lower1 = np.array([240,240,240])
   upper1 = np.array([255,255,255])
   mask1 = cv2.inRange(img, lower1, upper1)
   res =cv2.bitwise_and(img, img, mask = mask1)
-  image, cnts, hierarchy = cv2.findContours(mask1, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+  #image, cnts, hierarchy = cv2.findContours(mask1, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+  # using an older version of cv2
+  cnts, hierarchy = cv2.findContours(mask1, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
   cnt = cnts[0]
   size = len(cnts)
-  #print(size)
+  print("size of hot spot: " + str(size))
   #M = cv2.moments(cnt)
   #print(M)
   x,y,w,h = cv2.boundingRect(cnt)

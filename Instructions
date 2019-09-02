@@ -1,0 +1,13 @@
+original purethermal library from: https://github.com/Kheirlb/purethermal1-uvc-capture
+compiled using the following commands:
+
+
+This was selected over the default library for ease of build and use (especially ratiometric mode) on rasberry pi
+
+the following command was used to update rasberry pi (the easy way):
+curl https://get.pimoroni.com/uptodate | bash
+
+the hard way would have been:
+sudo apt-get update
+sudo apt-get upgrade
+sudo reboot
