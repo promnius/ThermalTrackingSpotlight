@@ -11,6 +11,7 @@ try:
 except ImportError:
   from Queue import Queue
 import platform
+import SpotlightTracking
 
 BUF_SIZE = 2
 q = Queue(BUF_SIZE)
@@ -38,68 +39,8 @@ def py_frame_callback(frame, userptr):
 
 PTR_PY_FRAME_CALLBACK = CFUNCTYPE(None, POINTER(uvc_frame), c_void_p)(py_frame_callback)
 
-def ktof(val):
-  return (1.8 * ktoc(val) + 32.0)
 
-def ktoc(val):
-  return (val - 27315) / 100.0
-
-def raw_to_8bit(data):
-  cv2.normalize(data, data, 0, 65535, cv2.NORM_MINMAX)
-  np.right_shift(data, 8, data)
-  return cv2.cvtColor(np.uint8(data), cv2.COLOR_GRAY2RGB)
-
-def display_temperature(img, val_k, loc, color):
-  val = ktof(val_k)
-  cv2.putText(img,"{0:.1f} degF".format(val), loc, cv2.FONT_HERSHEY_SIMPLEX, 0.75, color, 2)
-  x, y = loc
-  cv2.line(img, (x - 2, y), (x + 2, y), color, 1)
-  cv2.line(img, (x, y - 2), (x, y + 2), color, 1)
-
-def findBounds(img, fire):
-  print("finding bounds")
-  #print(minTemp)
-  lower1 = np.array([240,240,240])
-  upper1 = np.array([255,255,255])
-  mask1 = cv2.inRange(img, lower1, upper1)
-  res =cv2.bitwise_and(img, img, mask = mask1)
-  #image, cnts, hierarchy = cv2.findContours(mask1, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
-  # using an older version of cv2
-  cnts, hierarchy = cv2.findContours(mask1, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
-  if len(cnts) > 0:
-    cnt = cnts[0]
-    size = len(cnts)
-    print("size of hot spot: " + str(size))
-    #M = cv2.moments(cnt)
-    #print(M)
-    x,y,w,h = cv2.boundingRect(cnt)
-    res = cv2.rectangle(res,(x,y),(x+w,y+h),(0,255,0),2)
-    
-    centres = []
-    for i in range(len(cnts)):
-      x,y,w,h = cv2.boundingRect(cnts[i])
-      if (fire == True):
-        print('Location on Image: (' + str(x+w) +  ', ' + str(y+h) + ')')
-      res = cv2.rectangle(res,(x,y),(x+w,y+h),(0,255,0),2)
-      #moments = cv2.moments(cnts[i])
-      #centres.append((int(moments['m10']/moments['m00']), int(moments['m01']/moments['m00'])))
-      #cv2.circle(img, centres[-1], 3, (0,0,0), -1)
-  else:
-    pass
-    #res = cv2.rectangle(
-    
-  return res
-  
-def findMask(img):
-  #print("finding bounds")
-  #print(minTemp)
-  lower1 = np.array([240,240,240])
-  upper1 = np.array([255,255,255])
-  mask1 = cv2.inRange(img, lower1, upper1)
-  res =cv2.bitwise_and(img, img, mask = mask1)
-  return res
-
-
+"""
 def findHotObjects(img):
   #print(img)
   imgBlurred = cv2.GaussianBlur(img,(9,9),cv2.BORDER_DEFAULT)
@@ -125,6 +66,7 @@ def findTargetCoordinates(img, detector):
   im_with_keypoints = cv2.drawKeypoints(imgBorder,keypoints,np.array([]),(0,0,255),cv2.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS)
   return im_with_keypoints
   #return imgInverse
+  """
 
 def main():
   params = cv2.SimpleBlobDetector_Params()
@@ -200,8 +142,9 @@ def main():
             break
           data = cv2.resize(data[:,:], (640, 480))
           #minVal, maxVal, minLoc, maxLoc = cv2.minMaxLoc(data)
-          imgThreshold = findHotObjects(data)
-          img = findTargetCoordinates(imgThreshold,detector)
+          #imgThreshold = findHotObjects(data)
+          imgThreshold = SpotlightTracking.findHotObjects(data, 80)
+          img = SpotlightTracking.findTargetCoordinates(imgThreshold)
           #img = raw_to_8bit(data)
           #print imgBlackAndWhite
           #myres = findBounds(img, fire)
@@ -227,7 +170,10 @@ def main():
           #cv2.imshow('black and white', imgBlackAndWhite)
           
           val = True
-          cv2.waitKey(1)
+          c = cv2.waitKey(1)
+          if (chr(c&255) == 'q'):
+            print("YEP")
+            break
 
         cv2.destroyAllWindows()
       finally:
